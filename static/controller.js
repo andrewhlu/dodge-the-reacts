@@ -26,11 +26,11 @@ function init() {
     }, 1000);
 }
 
-function joinGame() {
+function joinGame(newGame) {
     introDiv.setAttribute("hidden", true);
     gameDiv.removeAttribute("hidden");
 
-    socket.emit('game-start', true);
+    socket.emit('game-start', newGame);
 }
 
 function spawnEnemy(id) {

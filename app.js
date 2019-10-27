@@ -129,6 +129,7 @@ io.on('connection', (socket) => {
       
       status.status = "in-progress";
       status.time = date.getTime() + 60000;
+      status.lives = 3;
 
       setStatus();
 
