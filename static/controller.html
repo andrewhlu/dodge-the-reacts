@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Spawn the Haters!</title>
+
+    <!-- FontAwesome Script -->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
+
+    <!-- Custom CSS -->
+    <link rel= "stylesheet" href= "controller.css">
+</head>
+<body>
+    <div id="intro-div" class="center-content-box">
+        <h1>Spawn the Haters!</h1>
+
+        <div class="white-trans-bg">
+            <h3>Your goal is to strategically spawn enemies to knock out your opponent in the VR headset.</h3>
+            <h3>If they get hit 3 times within 1 minute, you win!</h3>
+
+            <button onclick="joinGame();">Join Game!</button>
+        </div>
+    </div>
+
+    <div id="game-div" hidden="true">
+        <div class="row">
+            <div class="three-column game-header">
+                <h3><i class="fas fa-heart"></i> <span id="game-lives-counter">3</span></h3>
+            </div>
+            <div class="three-column game-header">
+                <h3><i class="fas fa-clock"></i> <span id="game-timer">60</span></h3>
+                <!-- <h1 id="game-timer">60</h1> -->
+            </div>
+            <div class="three-column game-header">
+                <h3><i class="fas fa-angry"></i> <span id="game-enemies-left">2</span></h3>
+            </div>
+        </div>
+
+        <hr>
+
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="controller.js"></script>
+</body>
+
+</html>
