@@ -6,7 +6,15 @@ const io = require('socket.io')(http);
 const asnyc = require('async');
 const fs = require('fs');
 
-var {Client, Query} = require('pg');
+const {Client, Query} = require('pg');
+
+var status = {
+  status: "start",
+  time: 0,
+  lives: 3
+};
+
+var timerTimeout;
 
 // Database configuration
 var config = {
@@ -26,54 +34,116 @@ app.get('/', function(req, res){
   res.sendFile(__dirname + '/index.html');
 });
 
+// Set status function
+function setStatus() {
+  const setupClient = new Client(config);
+  setupClient.connect();
+  setupClient.query('insert into status values ($1, $2, $3);', [status.status, status.time, status.lives], (error, res) => {
+    if(error) {
+      console.log(error);
+    }
+  });
+}
+
 // Listen for controller enemy spawns
 io.on('connection', function(socket) {
-  const client = new Client(config);
-  client.connect();
+  const enemySpawnClient = new Client(config);
+  enemySpawnClient.connect();
 
   socket.on('enemy', function(msg){
     // console.log(msg, client);
-    client.query('insert into enemies values ($1, $2);', [msg.location, msg.pos], (error, res) => {
-      console.log("Inserted");
+    enemySpawnClient.query('insert into enemies values ($1, $2);', [msg.location, msg.pos], (error, res) => {
+      if(error) {
+        console.log(error);
+      }
     });
   });
 });
-
 
 // Event controller enemy spawns to VR users using CockroachDB CDC
 const cdcClient = new Client(config);
 cdcClient.connect();
 cdcClient.query('select cluster_logical_timestamp() as now;', (err, row) => {
-  const now = row.rows[0].now;
-  const query = cdcClient.query(new Query('CREATE CHANGEFEED FOR TABLE enemies WITH CURSOR=\'' + now + '\''));
-  query.on('row', (row) => {
-    const val = JSON.parse(row.value).after;
-    console.log(val);
+  if(err) {
+    console.log(err);
+  }
+  else {
+    const now = row.rows[0].now;
+    const query = cdcClient.query(new Query('CREATE CHANGEFEED FOR TABLE enemies WITH CURSOR=\'' + now + '\''));
+    query.on('row', (row) => {
+      const val = JSON.parse(row.value).after;
+      console.log(val);
 
-    io.emit('generate-new-enemy', val);
-  })
+      io.emit('generate-new-enemy', val);
+    })
+  }
 });
 
 // Listen for successful enemy hits
 io.on('connection', function(socket) {
-  const enemyHitClient = new Client(config);
-  enemyHitClient.connect();
-
   socket.on('user-hit', function(msg){
     if(msg) {
       console.log("The user was hit!");
-      // do something here
+      
+      status.lives--;
+
+      if(status.lives <= 0) {
+        status.lives = 0;
+        status.status = "enemy-win";
+      }
+
+      clearTimeout(timerTimeout);
+
+      setStatus();
     }
-    
-    // client.query('insert into enemies values ($1, $2);', [msg.location, msg.pos], (error, res) => {
-    //   console.log("Inserted");
-    // });
   });
 });
 
+// Event status to all users using CockroachDB CDC
+const statusClient = new Client(config);
+statusClient.connect();
+statusClient.query('select cluster_logical_timestamp() as now;', (err, row) => {
+  if(err) {
+    console.log(err);
+  }
+  else {
+    const now = row.rows[0].now;
+    const query = statusClient.query(new Query('CREATE CHANGEFEED FOR TABLE status WITH CURSOR=\'' + now + '\''));
+    query.on('row', (row) => {
+      const val = JSON.parse(row.value).after;
+      console.log(val);
+      status = val;
+
+      io.emit('status-update', val);
+    });
+  }
+});
+
+// Listen for start event
+io.on('connection', (socket) => {
+  socket.on('game-start', (msg) => {
+    if(msg) {
+      console.log("Game is starting!");
+
+      var date = new Date();
+      
+      status.status = "in-progress";
+      status.time = date.getTime() + 60000;
+
+      setStatus();
+
+      timerTimeout = setTimeout(() => {
+        status.status = "vr-win";
+      }, 60000);
+    }
+  });
+});
+
+setStatus();
+
 // Finally, open server on port and listen for connections.
 // This is a blocking function, keep this at the end!
-http.listen(3000, function(){
+http.listen(3000, function() {
   console.log('listening on *:3000');
 });
 

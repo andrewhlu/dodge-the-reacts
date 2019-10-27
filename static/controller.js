@@ -4,7 +4,7 @@ var introSpawnTimeDiv = document.getElementById("intro-spawn-time");
 
 var gameDiv = document.getElementById("game-div");
 var timerSpan = document.getElementById("game-timer");
-var livesSpan = document.getElementById("game-lives-timer");
+var livesSpan = document.getElementById("game-lives-counter");
 var enemiesSpan = document.getElementById("game-enemies-left");
 
 var socket = io();
@@ -12,15 +12,25 @@ var socket = io();
 var spawnsRemaining = 2;
 var spawnTimeout = 2; // in seconds
 
+var timeGameEnd = 0;
+
 function init() {
     introNumSpawnsSpan.innerHTML = spawnsRemaining;
     introSpawnTimeDiv.innerHTML = spawnTimeout;
     enemiesSpan.innerHTML = spawnsRemaining;
+
+    setInterval(() => {
+        var date = new Date();
+        var timeLeft = timeGameEnd - date.getTime();
+        timerSpan.innerHTML = (timeLeft > 0) ? Math.floor(timeLeft / 1000) : 0;
+    }, 1000);
 }
 
 function joinGame() {
     introDiv.setAttribute("hidden", true);
     gameDiv.removeAttribute("hidden");
+
+    socket.emit('game-start', true);
 }
 
 function spawnEnemy(id) {
@@ -66,3 +76,18 @@ function spawnEnemy(id) {
 window.onload = () => {
     init();
 };
+
+socket.on('status-update', (msg) => {
+    console.log(msg);
+    livesSpan.innerHTML = msg.lives;
+    timeGameEnd = msg.time;
+
+    if(msg.status == "start") {
+        introDiv.removeAttribute("hidden");
+        gameDiv.setAttribute("hidden", true);
+    }
+    else {
+        introDiv.setAttribute("hidden", true);
+        gameDiv.removeAttribute("hidden");
+    }
+});
