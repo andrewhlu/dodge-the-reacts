@@ -135,6 +135,7 @@ io.on('connection', (socket) => {
 
       timerTimeout = setTimeout(() => {
         status.status = "vr-win";
+        setStatus();
       }, 60000);
     }
   });

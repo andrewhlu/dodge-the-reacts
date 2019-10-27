@@ -3,6 +3,30 @@ var enemyTTL = 0;
 
 var userPosition;
 
+var lives = 0;
+var timer = 0;
+
+AFRAME.registerComponent('text-display', {
+    init: function() {
+        setInterval(() => {
+            var headerElement = document.querySelector('#sub-text');
+
+            var date = new Date();
+            var timeLeft = timer - date.getTime();
+
+            headerElement.setAttribute('text', {
+                value: "Lives: " +  lives + ", Time: " + ((timeLeft > 0) ? Math.floor(timeLeft / 1000) : 0)
+            }); 
+        }, 1000);
+    },
+    tick: function() {
+        socket.on('status-update', (msg) => {
+            lives = msg.lives;
+            timer = msg.time;
+        });
+    }
+});
+
 AFRAME.registerComponent('generate-enemies', {
     init: function() {
         var enemyElement = this.el;

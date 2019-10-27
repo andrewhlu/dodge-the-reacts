@@ -7,6 +7,8 @@ var timerSpan = document.getElementById("game-timer");
 var livesSpan = document.getElementById("game-lives-counter");
 var enemiesSpan = document.getElementById("game-enemies-left");
 
+var gameStatusDiv = document.getElementById ("game-status");
+
 var socket = io();
 
 var spawnsRemaining = 2;
@@ -89,5 +91,12 @@ socket.on('status-update', (msg) => {
     else {
         introDiv.setAttribute("hidden", true);
         gameDiv.removeAttribute("hidden");
+    }
+
+    if(msg.status == "vr-win") {
+        gameStatusDiv.innerHTML = "You lost!";
+    }
+    else if(msg.status == "enemy-win") {
+        gameStatusDiv.innerHTML = "You won!";
     }
 });
