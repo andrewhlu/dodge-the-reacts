@@ -42,7 +42,7 @@ body {
 	background: rgba(255, 255, 255, 0.5);
 }
 
-input, button {
+.white-trans-bg button {
 	margin: 1em;
 	width: 400px;
 	height: 50px;
@@ -53,6 +53,11 @@ input, button {
     background-color: #3cb371;
     color: #fff;
     font-family: "Avenir";
+}
+
+hr {
+    width: 80%;
+    border: 1px solid black;
 }
 
 .game-header {
@@ -71,6 +76,27 @@ input, button {
     content: "";
     display: table;
     clear: both;
+}
+
+.field {
+    position: relative;
+    width: 90%;
+    margin: auto;
+}
+
+.field img {
+    width: 100%;
+    height: auto;
+}
+
+.field button {
+    width: 10%;
+    height: 10%;
+    margin: 0.72%;
+    position: absolute;
+    border: none;
+	border-radius: 10px;
+    background-color: #3cb371;
 }
 
 /* .body-container {

@@ -3,6 +3,9 @@
 <head>
     <title>Spawn the Haters!</title>
 
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+
     <!-- FontAwesome Script -->
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
 
@@ -37,6 +40,34 @@
 
         <hr>
 
+        <div class="field">
+            <img src="images/field.png" alt="Picture of field">
+
+            <!-- Buttons -->
+            <button id="button-L0" style="left: 2%; top: 67.14%" onclick="spawnEnemy('L0');">L0</button>
+            <button id="button-L1" style="left: 2%; top: 55.71%" onclick="spawnEnemy('L1');">L1</button>
+            <button id="button-L2" style="left: 2%; top: 44.29%" onclick="spawnEnemy('L2');">L2</button>
+            <button id="button-L3" style="left: 2%; top: 32.86%" onclick="spawnEnemy('L3');">L3</button>
+            <button id="button-L4" style="left: 2%; top: 21.43%" onclick="spawnEnemy('L4');">L4</button>
+            
+            <button id="button-T0" style="left: 21.43%; top: 2%" onclick="spawnEnemy('T0');">T0</button>
+            <button id="button-T1" style="left: 32.86%; top: 2%" onclick="spawnEnemy('T1');">T1</button>
+            <button id="button-T2" style="left: 44.29%; top: 2%" onclick="spawnEnemy('T2');">T2</button>
+            <button id="button-T3" style="left: 55.71%; top: 2%" onclick="spawnEnemy('T3');">T3</button>
+            <button id="button-T4" style="left: 67.14%; top: 2%" onclick="spawnEnemy('T4');">T4</button>
+
+            <button id="button-R0" style="right: 2%; top: 21.43%" onclick="spawnEnemy('R0');">R0</button>
+            <button id="button-R1" style="right: 2%; top: 32.86%" onclick="spawnEnemy('R1');">R1</button>
+            <button id="button-R2" style="right: 2%; top: 44.29%" onclick="spawnEnemy('R2');">R2</button>
+            <button id="button-R3" style="right: 2%; top: 55.71%" onclick="spawnEnemy('R3');">R3</button>
+            <button id="button-R4" style="right: 2%; top: 67.14%" onclick="spawnEnemy('R4');">R4</button>
+            
+            <button id="button-B0" style="left: 67.14%; bottom: 2.5%" onclick="spawnEnemy('B0');">B0</button>
+            <button id="button-B1" style="left: 55.71%; bottom: 2.5%" onclick="spawnEnemy('B1');">B1</button>
+            <button id="button-B2" style="left: 44.29%; bottom: 2.5%" onclick="spawnEnemy('B2');">B2</button>
+            <button id="button-B3" style="left: 32.86%; bottom: 2.5%" onclick="spawnEnemy('B3');">B3</button>
+            <button id="button-B4" style="left: 21.43%; bottom: 2.5%" onclick="spawnEnemy('B4');">B4</button>
+        </div>
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
