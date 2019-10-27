@@ -1,4 +1,7 @@
 var socket = io();
+var enemyTTL = 0;
+
+var userPosition;
 
 AFRAME.registerComponent('generate-enemies', {
     init: function() {
@@ -118,14 +121,55 @@ AFRAME.registerComponent('generate-enemies', {
             newEnemy.setAttribute('position', position);
             newEnemy.setAttribute('rotation', rotation);
             newEnemy.setAttribute('visible', true);
+            newEnemy.setAttribute('enemy', true);
             for(var i = 0; i < animations.length; i++) {
                 newEnemy.setAttribute('animation' + (i > 0 ? '__' + i : ''), animations[i]);
             }
             enemyElement.appendChild(newEnemy);
 
+            enemyTTL = animations[animations.length - 1].delay + animations[animations.length - 1].dur + after_delay;
+
             setTimeout(() => {
                 enemyElement.removeChild(newEnemy);
-            }, animations[animations.length - 1].delay + animations[animations.length - 1].dur + after_delay);
+            }, enemyTTL);
         });
     }
 });
+
+AFRAME.registerComponent('enemy', {
+    init: function() {
+        var threshold = 0.5;
+
+        var enemyElement = this.el;
+
+        var enemyInterval = window.setInterval(() => {
+            var enemyPosition = enemyElement.object3D.position;
+            // console.log(enemyPosition, userPosition);
+
+			if(Math.abs(enemyPosition.x - userPosition.x) < threshold && Math.abs(enemyPosition.z - userPosition.z) < threshold) {
+                console.log("You got hit!");
+                clearInterval(enemyInterval);
+
+                socket.emit('user-hit', true);
+				// skyElement.setAttribute('color', "red");
+				// gameEnded = true;
+				// died(); //firebase
+
+				// var subTextElement = document.querySelector('#sub-text');
+				// subTextElement.setAttribute('text', {value: "You exploded!"});
+			}
+		}, 100);
+
+        setTimeout(() => {
+            clearInterval(enemyInterval);
+        }, enemyTTL - 300);
+    }
+});
+
+// Continuously get the position of the user
+AFRAME.registerComponent('camera-listener', {
+    tick: function () {
+      var cameraEl = this.el.sceneEl.camera.el;
+      userPosition = cameraEl.getAttribute('position');
+    }
+  });

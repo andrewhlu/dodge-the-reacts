@@ -20,12 +20,13 @@ var config = {
   }
 };
 
+// Serve static pages (anything in the static directory)
 app.use('/static', express.static('static'));
-
 app.get('/', function(req, res){
   res.sendFile(__dirname + '/index.html');
 });
 
+// Listen for controller enemy spawns
 io.on('connection', function(socket) {
   const client = new Client(config);
   client.connect();
@@ -38,6 +39,8 @@ io.on('connection', function(socket) {
   });
 });
 
+
+// Event controller enemy spawns to VR users using CockroachDB CDC
 const cdcClient = new Client(config);
 cdcClient.connect();
 cdcClient.query('select cluster_logical_timestamp() as now;', (err, row) => {
@@ -51,6 +54,29 @@ cdcClient.query('select cluster_logical_timestamp() as now;', (err, row) => {
   })
 });
 
+// Listen for successful enemy hits
+io.on('connection', function(socket) {
+  const enemyHitClient = new Client(config);
+  enemyHitClient.connect();
+
+  socket.on('user-hit', function(msg){
+    if(msg) {
+      console.log("The user was hit!");
+      // do something here
+    }
+    
+    // client.query('insert into enemies values ($1, $2);', [msg.location, msg.pos], (error, res) => {
+    //   console.log("Inserted");
+    // });
+  });
+});
+
+// Finally, open server on port and listen for connections.
+// This is a blocking function, keep this at the end!
+http.listen(3000, function(){
+  console.log('listening on *:3000');
+});
+
 // truncate table enemies
 
 // select count(*) from enemies where location in ('right', 'left')
@@ -59,8 +85,3 @@ cdcClient.query('select cluster_logical_timestamp() as now;', (err, row) => {
 // pos int check pos values in (0, 1, 2, 3, 4),
 // location string check location values in ('top', 'right', 'left', 'bottom')
 // )
-
-// This is a blocking function, keep this at the end!
-http.listen(3000, function(){
-  console.log('listening on *:3000');
-});
